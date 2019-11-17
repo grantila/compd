@@ -1,0 +1,7 @@
+.nyc_output/
+coverage/
+build/
+node_modules/
+dist
+yarn.lock
+.vscode/

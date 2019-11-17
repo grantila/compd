@@ -1,0 +1,75 @@
+import { promisify } from 'util'
+import * as fs from 'fs'
+import * as execa from 'execa'
+import { safeLoad as loadYaml } from 'js-yaml'
+
+const readFile = promisify( fs.readFile );
+
+
+export interface DockerComposeExec
+{
+	loadFile( ): Promise< unknown >;
+	bringUp( ): Promise< void >;
+	teardown( ): Promise< void >;
+	getHostPort( serviceName: string, containerPort: number ): Promise< {
+		serviceName: string;
+		container: number;
+		hostIP: string;
+		host: number;
+	} >;
+}
+
+export class DefaultDockerComposeExec implements DockerComposeExec
+{
+	constructor( public dockerComposeFile: string )
+	{
+		if ( !fs.existsSync( this.dockerComposeFile ) )
+			throw new Error(
+				`Cannot find file: ${this.dockerComposeFile}`
+			);
+	}
+
+	async loadFile( )
+	{
+		const content = await readFile( this.dockerComposeFile, 'utf8' );
+		return loadYaml( content );
+	}
+
+	async bringUp( )
+	{
+		await execa(
+			'docker-compose',
+			[ '--file', this.dockerComposeFile, 'up', '--detach' ]
+		);
+	}
+
+	async teardown( )
+	{
+		await execa(
+			'docker-compose',
+			[ '--file', this.dockerComposeFile, 'down' ]
+		);
+	}
+
+	async getHostPort( serviceName: string, containerPort: number )
+	{
+		const { stdout } = await execa(
+			'docker-compose',
+			[
+				'-f',
+				this.dockerComposeFile,
+				'port',
+				serviceName,
+				`${containerPort}`,
+			]
+		);
+
+		const [ hostIP, host ] = stdout.split( ':' );
+		return {
+			serviceName,
+			container: containerPort,
+			hostIP,
+			host: parseInt(host, 10),
+		};
+	}
+}

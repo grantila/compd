@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/grantila/compd"
   },
+  "bin" : {
+    "compd" : "./bin/compd"
+  },
   "files": [
     "dist"
   ],

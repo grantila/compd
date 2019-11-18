@@ -15,6 +15,7 @@ export interface DockerComposeService
 	name: string;
 	image: string;
 	containerName: string;
+	containerId: string;
 	labels: Array< string >;
 	ports: Array< Port >;
 }
@@ -30,6 +31,7 @@ function parseComposeFile( composeFile: any ): Array< DockerComposeService >
 			name,
 			image: service.image,
 			containerName: service.container_name,
+			containerId: void 0 as any as string, // Will be deduced
 			labels: service.labels || [ ],
 			ports: parsePorts( service.ports || [ ] ) as Array< Port >,
 		} ) );
@@ -73,6 +75,17 @@ export class DockerCompose
 	private async getHostPorts( )
 	{
 		const { services } = this.ensureLoaded( );
+
+		await Promise.all(
+			services
+			.filter( service => !service.containerName )
+			.map( async service =>
+			{
+				const { name } = service;
+				const id = await this.dockerComposeExec.getContainerId( name );
+				service.containerName = id;
+			} )
+		);
 
 		const containerPorts =
 			( [ ] as Array< { serviceName: string; port: number } > ).concat(

@@ -11,6 +11,7 @@ export interface DockerComposeExec
 	loadFile( ): Promise< unknown >;
 	bringUp( ): Promise< void >;
 	teardown( ): Promise< void >;
+	getContainerId( serviceName: string ): Promise< string >;
 	getHostPort( serviceName: string, containerPort: number ): Promise< {
 		serviceName: string;
 		container: number;
@@ -59,6 +60,26 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 				stderr: process.stderr,
 			}
 		);
+	}
+
+	async getContainerId( serviceName: string )
+	{
+		const { stdout } = await execa(
+			'docker-compose',
+			[
+				'--file',
+				this.dockerComposeFile,
+				'ps',
+				'--quiet',
+				serviceName,
+			],
+			{
+				stdin: process.stdin,
+				stderr: process.stderr,
+			}
+		);
+
+		return stdout;
 	}
 
 	async getHostPort( serviceName: string, containerPort: number )

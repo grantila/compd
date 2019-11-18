@@ -7,7 +7,7 @@
 
 # compd
 
-`compd` (or _composed_) is a program that spawns of a custom command while ensuring a `docker-compose` set of containers are running. It will wait for the containers to be started (and the programs within to be _ready_ for requests, such as SQL databases), and (optionally) teardown the docker-composed containers. It forwards the exit code from the custom command and exits with the same exit code after the containers have been stopped.
+`compd` (or _**comp**ose**d**_) is a program that spawns of a custom command while ensuring a `docker-compose` set of containers are running. It will wait for the containers to be started (and the programs within to be _ready_ for requests, such as SQL databases), and (optionally) teardown the docker-composed containers. It forwards the exit code from the custom command and exits with the same exit code after the containers have been stopped.
 
 Ports that are only specified on the container side (i.e. without hard-coded host ports) are deduced, and environment variables are provided to the running command. If a docker-compose file has a service called `"redis"` and a container port `6379`, this will cause an environment variable to be created called `REDIS_PORT_6379` with the value being the host port.
 
@@ -21,14 +21,30 @@ npm install -g compd
 # or with yarn
 yarn global add compd
 
-compd --file docker-compise.yaml my-app
+compd --file docker-compose.yaml my-app
 ```
 
 or run through `npx`:
 
 ```
-npx compd --file docker-compise.yaml my-app
+npx compd --file docker-compose.yaml my-app
 ```
+
+
+# Readiness detectors
+
+When all host ports are deduced from the container ports, `compd` start scanning the ports to see if they are open. When they are, `compd` will try to deduce what potentially _known_ services are being run (such as a redis server, a Postgres server etc) and will use different mechanisms for each type of server to detect if it is ready for requests. E.g. a Postgres port can be open, but the server not be available for requests immediately. It can take seconds for it to be ready.
+
+The custom command won't be spawned until all ports with _known_ servers are positively ready.
+
+
+## Current detectors
+
+There is support for:
+
+ * Open TCP ports (before trying the below detectors)
+ * Redis
+ * Postgres
 
 
 

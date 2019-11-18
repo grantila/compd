@@ -137,6 +137,14 @@ export class DockerCompose
 				const envName = `${ name }_port_${ container }`.toUpperCase( );
 				env[ envName ] = '' + host;
 			} );
+
+			if ( ports.length === 1 )
+			{
+				// If only one port exists, create a shortcut env var
+				const { host } = ports[ 0 ];
+				const envName = `${ name }_port`.toUpperCase( );
+				env[ envName ] = '' + host;
+			}
 		} );
 
 		return env;

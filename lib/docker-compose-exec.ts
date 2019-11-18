@@ -74,7 +74,6 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 			],
 			{
 				stdin: process.stdin,
-				stdout: process.stdout,
 				stderr: process.stderr,
 			}
 		);

@@ -5,7 +5,7 @@ import { DockerCompose, DockerComposeService } from './docker-compose'
 import { forwardSignals, ForwardSignalCleanup } from './process'
 import { Readiness } from './readiness'
 import { ServiceDescriptor, Detector } from './readiness-detectors/types'
-import { makeRedisDetector } from './readiness-detectors/index'
+import { makeRedisDetector, makeTCPDetector } from './readiness-detectors/index'
 import { AppContext } from './app-context'
 
 
@@ -30,7 +30,8 @@ function convertServiceToDescriptor(
 function makeReadinessDetectors( )
 {
 	return [
-		makeRedisDetector( { retryDelay: 100, retryTime: 5000 } )
+		makeTCPDetector( { retryDelay: 100, retryTime: 5000 } ),
+		makeRedisDetector( { retryDelay: 100, retryTime: 5000 } ),
 	];
 }
 

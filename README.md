@@ -9,7 +9,7 @@
 
 `compd` (or _composed_) is a program that spawns of a custom command while ensuring a `docker-compose` set of containers are running. It will wait for the containers to be started (and the programs within to be _ready_ for requests, such as SQL databases), and (optionally) teardown the docker-composed containers. It forwards the exit code from the custom command and exits with the same exit code after the containers have been stopped.
 
-Ports that are only specified on the container side (i.e. without hard-coded host ports) are deduced, and environment variables are provided to the running command. If a docker-compose file has a service called `"redis"` and a container port specified `6379` will cause and environment variable to be created called `REDIS_PORT_6379` with the value being the host port.
+Ports that are only specified on the container side (i.e. without hard-coded host ports) are deduced, and environment variables are provided to the running command. If a docker-compose file has a service called `"redis"` and a container port `6379`, this will cause an environment variable to be created called `REDIS_PORT_6379` with the value being the host port.
 
 
 # Installation

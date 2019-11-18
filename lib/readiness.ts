@@ -1,8 +1,3 @@
-// redis:
-// image: redis
-// ports:
-//   - "6379"
-
 import { ServiceDescriptor, Detector } from './readiness-detectors/types'
 
 export class Readiness

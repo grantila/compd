@@ -1,6 +1,7 @@
 import { oppa } from 'oppa'
 
 import { wrap } from './wrap'
+import { AppContext } from './app-context'
 
 const parsed = oppa( {
 	name: 'compd',
@@ -42,7 +43,9 @@ if ( !file )
 	process.exit( 1 );
 }
 
-wrap( command, args, file, { verbose, teardown } )
+const appContext = new AppContext( verbose, teardown );
+
+wrap( command, args, file, { appContext } )
 .then( exitCode =>
 {
 	process.exit( exitCode );

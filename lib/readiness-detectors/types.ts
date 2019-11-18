@@ -3,18 +3,30 @@ import { Port } from '../ports'
 
 export interface ServiceDescriptor
 {
+	dockerComposeFile: string;
 	serviceName: string;
 	image: string;
 	ports: ReadonlyArray< Port >;
 }
 
+export interface MatchResult
+{
+	ports: ReadonlyArray< Port >;
+	final: boolean;
+}
+
 export interface Detector
 {
+	/**
+	 * The name of the detector
+	 */
+	name: string;
+
 	/**
 	 * Matches a service descriptor and returns the container ports it can
 	 * await.
 	 */
-	matches( service: ServiceDescriptor ): ReadonlyArray< Port >;
+	matches( service: ServiceDescriptor ): MatchResult;
 
 	/**
 	 * Wait for a set of ports given a service descriptor.

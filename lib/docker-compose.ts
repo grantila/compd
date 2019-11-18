@@ -44,21 +44,23 @@ function getFileFromCwd( file: string )
 
 export class DockerCompose
 {
+	public dockerComposeFile: string;
+
 	private services?: ReadonlyArray< DockerComposeService >;
 	private dockerComposeExec: DockerComposeExec;
 
 	constructor(
-		private dockerComposeFile: string,
+		dockerComposeFile: string,
 		dockerComposeExec?: DockerComposeExec
 	)
 	{
-		if ( !this.dockerComposeFile )
+		if ( !dockerComposeFile )
 			throw new Error( "DockerCompose: Misssing argument" );
 
+		this.dockerComposeFile = getFileFromCwd( dockerComposeFile );
+
 		this.dockerComposeExec = dockerComposeExec ??
-			new DefaultDockerComposeExec(
-				getFileFromCwd( this.dockerComposeFile )
-			);
+			new DefaultDockerComposeExec( this.dockerComposeFile );
 	}
 
 	private ensureLoaded( )

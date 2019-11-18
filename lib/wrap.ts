@@ -6,15 +6,18 @@ import { forwardSignals, ForwardSignalCleanup } from './process'
 import { Readiness } from './readiness'
 import { ServiceDescriptor, Detector } from './readiness-detectors/types'
 import { makeRedisDetector } from './readiness-detectors/index'
+import { AppContext } from './app-context'
 
 
 function convertServiceToDescriptor(
-	services: ReadonlyArray< DockerComposeService >
+	services: ReadonlyArray< DockerComposeService >,
+	dockerComposeFile: string
 )
 {
 	return services.map( service =>
 		{
 			const serviceDescriptor: ServiceDescriptor = {
+				dockerComposeFile,
 				serviceName: service.name,
 				image: service.image,
 				ports: service.ports,
@@ -33,21 +36,21 @@ function makeReadinessDetectors( )
 
 export interface Options
 {
-	verbose: boolean;
-	teardown: boolean;
-	readinessDetectors: ReadonlyArray< Detector >;
+	appContext: AppContext;
+	readinessDetectors?: ReadonlyArray< Detector >;
 }
 
 export async function wrap(
 	command: string,
 	args: ReadonlyArray< string >,
 	dockerComposeFile: string,
-	{ verbose, teardown, readinessDetectors }: Partial< Options > = { }
+	{ appContext, readinessDetectors }: Options
 )
 : Promise< number >
 {
 	const dc = new DockerCompose( dockerComposeFile );
 	const readiness = new Readiness(
+		appContext,
 		readinessDetectors ?? makeReadinessDetectors( )
 	);
 
@@ -60,7 +63,8 @@ export async function wrap(
 		const services = await dc.setup( );
 		const env = dc.makePortEnvironmentVariables( );
 
-		const serviceDescriptors = convertServiceToDescriptor( services );
+		const serviceDescriptors =
+			convertServiceToDescriptor( services, dc.dockerComposeFile );
 		await readiness.waitForServices( serviceDescriptors );
 
 		child = execa(
@@ -86,12 +90,12 @@ export async function wrap(
 	}
 	catch ( err )
 	{
-		if ( verbose )
+		if ( appContext.verbose )
 			console.error( err.stack );
 	}
 	finally
 	{
-		if ( teardown !== false )
+		if ( appContext.teardown !== false )
 			await dc.teardown( );
 
 		unregisterSignals?.( );

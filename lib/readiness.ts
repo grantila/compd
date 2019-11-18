@@ -1,43 +1,88 @@
-import { ServiceDescriptor, Detector } from './readiness-detectors/types'
+import {
+	ServiceDescriptor,
+	Detector,
+	MatchResult,
+} from './readiness-detectors/types'
+import { AppContext } from './app-context'
+
+function cloneService(
+	service: ServiceDescriptor,
+	excludeHostPorts: Array< number >
+)
+: ServiceDescriptor
+{
+	return {
+		...service,
+		ports: service.ports.filter( port =>
+			!excludeHostPorts.includes( port.host )
+		),
+	}
+}
 
 export class Readiness
 {
-	constructor( public detectors: ReadonlyArray< Detector > )
+	constructor(
+		private appContext: AppContext,
+		public detectors: ReadonlyArray< Detector >
+	)
 	{
 	}
 
 	async waitForService( service: ServiceDescriptor )
 	{
-		const findDetector = ( ) =>
+		const findDetectors = ( ) =>
 		{
+			const matches: Array< MatchResult & { detector: Detector } > = [ ];
+			let handledService = service;
+
 			for ( let i = 0; i < this.detectors.length; ++i )
 			{
 				const detector = this.detectors[ i ];
-				const ports = detector.matches( service );
-				if ( ports.length > 0 )
-					return { detector, ports };
+				const match = detector.matches( handledService );
+				if ( match.ports.length > 0 )
+				{
+					matches.push( { detector, ...match } );
+
+					if ( match.final )
+						handledService = cloneService(
+							handledService,
+							match.ports.map( port => port.host )
+						);
+				}
 			}
+
+			return matches;
 		}
 
-		const match = findDetector( );
+		const matches = findDetectors( );
 
-		if ( !match )
+		if ( matches.length === 0 || !matches[ matches.length - 1 ].final )
 		{
 			console.warn(
 				`Service ${service.serviceName} not understood, ` +
-				"cannot await it."
+				"cannot properly await it."
 			);
 			return;
 		}
 
-		const { detector, ports } = match;
+		for ( const match of matches )
+		{
+			const { detector, ports } = match;
 
-		const waitableService: ServiceDescriptor = {
-			...service,
-			ports,
-		};
+			const waitableService: ServiceDescriptor = {
+				...service,
+				ports,
+			};
 
-		await detector.waitFor( waitableService );
+			const hostPorts = ports.map( port => port.host ).join( ', ' );
+			if ( this.appContext.verbose )
+				console.log(
+					`Service ${service.serviceName}: ${detector.name} ` +
+					`detector, checks ports: ${hostPorts}`
+				);
+
+			await detector.waitFor( waitableService );
+		}
 	}
 
 	async waitForServices( services: ReadonlyArray< ServiceDescriptor > )

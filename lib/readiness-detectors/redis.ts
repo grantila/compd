@@ -13,7 +13,8 @@ export function makeDetector( opts: DetectorOptions ): Detector
 	return {
 		matches( service: ServiceDescriptor )
 		{
-			const matchByImageName = service.image.includes( 'redis' );
+			const matchByImageName =
+				service.image.toLowerCase( ).includes( 'redis' );
 
 			if ( matchByImageName && service.ports.length === 1 )
 			{

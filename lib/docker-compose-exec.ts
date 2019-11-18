@@ -39,7 +39,12 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 	{
 		await execa(
 			'docker-compose',
-			[ '--file', this.dockerComposeFile, 'up', '--detach' ]
+			[ '--file', this.dockerComposeFile, 'up', '--detach' ],
+			{
+				stdin: process.stdin,
+				stdout: process.stdout,
+				stderr: process.stderr,
+			}
 		);
 	}
 
@@ -47,7 +52,12 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 	{
 		await execa(
 			'docker-compose',
-			[ '--file', this.dockerComposeFile, 'down' ]
+			[ '--file', this.dockerComposeFile, 'down' ],
+			{
+				stdin: process.stdin,
+				stdout: process.stdout,
+				stderr: process.stderr,
+			}
 		);
 	}
 
@@ -61,7 +71,12 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 				'port',
 				serviceName,
 				`${containerPort}`,
-			]
+			],
+			{
+				stdin: process.stdin,
+				stdout: process.stdout,
+				stderr: process.stderr,
+			}
 		);
 
 		const [ hostIP, host ] = stdout.split( ':' );

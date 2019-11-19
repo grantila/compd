@@ -10,29 +10,49 @@ import {
 
 export class NotSetupError extends Error { }
 
+export type KeyValue = { [ key: string ]: string; };
+
 export interface DockerComposeService
 {
+	dockerComposeFile: string;
 	name: string;
 	image: string;
 	containerName: string;
 	containerId: string;
-	labels: Array< string >;
+	environment: KeyValue;
+	labels: KeyValue;
 	ports: Array< Port >;
 }
 
-function parseComposeFile( composeFile: any ): Array< DockerComposeService >
+function parseLabels( labels: Array< string > )
 {
-	return Object.keys( composeFile.services )
+	const ret: DockerComposeService[ 'labels' ] = { };
+
+	labels.forEach( line =>
+	{
+		const [ key, ...values ] = line.split( '=' );
+		ret[ key ] = values.join( '=' );
+	} );
+
+	return ret;
+}
+
+function parseComposeFile( dockerComposeFile: string, composeFileData: any )
+: Array< DockerComposeService >
+{
+	return Object.keys( composeFileData.services )
 		.map( serviceName => ( {
 			name: serviceName,
-			service: composeFile.services[ serviceName ],
+			service: composeFileData.services[ serviceName ],
 		} ) )
 		.map( ( { name, service } ) => ( {
+			dockerComposeFile,
 			name,
 			image: service.image,
 			containerName: service.container_name,
 			containerId: void 0 as any as string, // Will be deduced
-			labels: service.labels || [ ],
+			environment: service.environment || { },
+			labels: parseLabels( service.labels ) || { },
 			ports: parsePorts( service.ports || [ ] ) as Array< Port >,
 		} ) );
 }
@@ -160,6 +180,7 @@ export class DockerCompose
 		const parse = async ( ) =>
 		{
 			this.services = parseComposeFile(
+				this.dockerComposeFile,
 				await this.dockerComposeExec.loadFile( )
 			);
 		};

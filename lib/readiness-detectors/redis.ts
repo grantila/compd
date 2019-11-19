@@ -1,12 +1,8 @@
 import * as execa from 'execa'
 
-import {
-	Detector,
-	ServiceDescriptor,
-	RetryLimitError,
-	DetectorOptions,
-} from './types'
+import { Detector, RetryLimitError, DetectorOptions } from './types'
 import { retry } from './utils'
+import { DockerComposeService } from '../docker-compose'
 
 
 async function redisCliInfo( dockerComposeFile: string, serviceName: string )
@@ -40,7 +36,7 @@ export function makeDetector( opts: DetectorOptions ): Detector
 {
 	return {
 		name: "redis",
-		matches( service: ServiceDescriptor )
+		matches( service: DockerComposeService )
 		{
 			const matchByImageName =
 				service.image.toLowerCase( ).includes( 'redis' );
@@ -57,10 +53,10 @@ export function makeDetector( opts: DetectorOptions ): Detector
 
 			return { ports: found ? [ found ] : [ ], final: true };
 		},
-		async waitFor( service: ServiceDescriptor )
+		async waitFor( service: DockerComposeService )
 		{
 			const available = ( ) =>
-				redisCliInfo( service.dockerComposeFile, service.serviceName );
+				redisCliInfo( service.dockerComposeFile, service.name );
 
 			if ( !await retry( available, opts.retryDelay, opts.retryTime ) )
 				throw new RetryLimitError( );

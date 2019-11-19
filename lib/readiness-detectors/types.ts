@@ -1,13 +1,6 @@
 
 import { Port } from '../ports'
-
-export interface ServiceDescriptor
-{
-	dockerComposeFile: string;
-	serviceName: string;
-	image: string;
-	ports: ReadonlyArray< Port >;
-}
+import { DockerComposeService } from '../docker-compose'
 
 export interface MatchResult
 {
@@ -26,12 +19,12 @@ export interface Detector
 	 * Matches a service descriptor and returns the container ports it can
 	 * await.
 	 */
-	matches( service: ServiceDescriptor ): MatchResult;
+	matches( service: DockerComposeService ): MatchResult;
 
 	/**
 	 * Wait for a set of ports given a service descriptor.
 	 */
-	waitFor( service: ServiceDescriptor ): Promise< void >;
+	waitFor( service: DockerComposeService ): Promise< void >;
 }
 
 export interface DetectorOptions

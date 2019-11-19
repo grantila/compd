@@ -1,18 +1,20 @@
 import {
-	ServiceDescriptor,
 	Detector,
 	MatchResult,
 } from './readiness-detectors/types'
 import { AppContext } from './app-context'
+import { DockerComposeService } from './docker-compose'
 
 function cloneService(
-	service: ServiceDescriptor,
+	service: DockerComposeService,
 	excludeHostPorts: Array< number >
 )
-: ServiceDescriptor
+: DockerComposeService
 {
 	return {
 		...service,
+		environment: { ...service.environment },
+		labels: { ...service.labels },
 		ports: service.ports.filter( port =>
 			!excludeHostPorts.includes( port.host )
 		),
@@ -28,7 +30,7 @@ export class Readiness
 	{
 	}
 
-	async waitForService( service: ServiceDescriptor )
+	async waitForService( service: DockerComposeService )
 	{
 		const findDetectors = ( ) =>
 		{
@@ -59,7 +61,7 @@ export class Readiness
 		if ( matches.length === 0 || !matches[ matches.length - 1 ].final )
 		{
 			console.warn(
-				`Service ${service.serviceName} not understood, ` +
+				`Service ${service.name} not understood, ` +
 				"cannot properly await it."
 			);
 			return;
@@ -69,15 +71,15 @@ export class Readiness
 		{
 			const { detector, ports } = match;
 
-			const waitableService: ServiceDescriptor = {
+			const waitableService: DockerComposeService = {
 				...service,
-				ports,
+				ports: [ ...ports ],
 			};
 
 			const hostPorts = ports.map( port => port.host ).join( ', ' );
 			if ( this.appContext.verbose )
 				console.log(
-					`Service ${service.serviceName}: ${detector.name} ` +
+					`Service ${service.name}: ${detector.name} ` +
 					`detector, checks ports: ${hostPorts}`
 				);
 
@@ -85,7 +87,7 @@ export class Readiness
 		}
 	}
 
-	async waitForServices( services: ReadonlyArray< ServiceDescriptor > )
+	async waitForServices( services: ReadonlyArray< DockerComposeService > )
 	{
 		await Promise.all(
 			services.map( async service =>

@@ -1,10 +1,10 @@
 import { ExecaChildProcess, ExecaReturnValue } from 'execa'
 import * as execa from 'execa'
 
-import { DockerCompose, DockerComposeService } from './docker-compose'
+import { DockerCompose } from './docker-compose'
 import { forwardSignals, ForwardSignalCleanup } from './process'
 import { Readiness } from './readiness'
-import { ServiceDescriptor, Detector } from './readiness-detectors/types'
+import { Detector } from './readiness-detectors/types'
 import { AppContext } from './app-context'
 import {
 	makeRedisDetector,
@@ -12,24 +12,6 @@ import {
 	makePostgresDetector,
 } from './readiness-detectors/index'
 
-
-function convertServiceToDescriptor(
-	services: ReadonlyArray< DockerComposeService >,
-	dockerComposeFile: string
-)
-{
-	return services.map( service =>
-		{
-			const serviceDescriptor: ServiceDescriptor = {
-				dockerComposeFile,
-				serviceName: service.name,
-				image: service.image,
-				ports: service.ports,
-			};
-			return serviceDescriptor;
-		}
-	);
-}
 
 function makeReadinessDetectors( )
 {
@@ -69,9 +51,7 @@ export async function wrap(
 		const services = await dc.setup( );
 		const env = dc.makePortEnvironmentVariables( );
 
-		const serviceDescriptors =
-			convertServiceToDescriptor( services, dc.dockerComposeFile );
-		await readiness.waitForServices( serviceDescriptors );
+		await readiness.waitForServices( services );
 
 		child = execa(
 			command,

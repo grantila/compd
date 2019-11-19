@@ -1,27 +1,23 @@
 import * as net from 'net'
 import { map } from 'already'
 
-import {
-	Detector,
-	ServiceDescriptor,
-	RetryLimitError,
-	DetectorOptions,
-} from './types'
+import { Detector, RetryLimitError, DetectorOptions } from './types'
 import { retry } from './utils'
+import { DockerComposeService } from '../docker-compose'
 
 
 export function makeDetector( opts: DetectorOptions ): Detector
 {
 	return {
 		name: "tcp",
-		matches( service: ServiceDescriptor )
+		matches( service: DockerComposeService )
 		{
 			return {
 				ports: service.ports.filter( port => port.proto === 'tcp' ),
 				final: false,
 			};
 		},
-		async waitFor( service: ServiceDescriptor )
+		async waitFor( service: DockerComposeService )
 		{
 			const ports = service.ports.map( port => port.host );
 

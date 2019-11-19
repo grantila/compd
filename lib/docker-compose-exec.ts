@@ -2,9 +2,24 @@ import { promisify } from 'util'
 import * as fs from 'fs'
 import * as execa from 'execa'
 import { safeLoad as loadYaml } from 'js-yaml'
+import { KeyValue } from './docker-compose'
 
 const readFile = promisify( fs.readFile );
 
+
+function quote( text: string )
+{
+	return text.replace( /"/g, '\"' );
+}
+
+export function makeArgsFromEnvironment( env: KeyValue ): Array< string >
+{
+	return ( [ ] as Array< string > ).concat(
+		...Object.entries( env ).map( ( [ key, value ] ) => [
+			'-e', `'${ key }=${ quote( value ) }'`
+		] )
+	);
+}
 
 export interface DockerComposeExec
 {

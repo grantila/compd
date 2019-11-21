@@ -52,7 +52,7 @@ function parseComposeFile( dockerComposeFile: string, composeFileData: any )
 			containerName: service.container_name,
 			containerId: void 0 as any as string, // Will be deduced
 			environment: service.environment || { },
-			labels: parseLabels( service.labels ) || { },
+			labels: parseLabels( service.labels ),
 			ports: parsePorts( service.ports || [ ] ) as Array< Port >,
 		} ) );
 }

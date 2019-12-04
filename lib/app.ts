@@ -3,6 +3,9 @@ import { oppa } from 'oppa'
 import { wrap } from './wrap'
 import { AppContext } from './app-context'
 
+const envToBool = (key: string, defaultValue = false) =>
+	!process.env[ key ] ? defaultValue : process.env[ key ] !== '0';
+
 const parsed = oppa( {
 	name: 'compd',
 	description: [
@@ -22,9 +25,13 @@ const parsed = oppa( {
 } )
 .add( {
 	name: 'teardown',
-	description: 'Tears down the docker-compose after wrapping a command',
+	description: [
+		'Tears down the docker-compose after wrapping a command.',
+		'Can also be set as COMPD_NO_TEARDOWN=1.'
+	],
 	default: true,
 	type: 'boolean',
+	realDefault: !envToBool('COMPD_NO_TEARDOWN', false),
 } )
 .add( {
 	name: 'file',

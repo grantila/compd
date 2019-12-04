@@ -51,6 +51,9 @@ export async function wrap(
 		const services = await dc.setup( );
 		const env = dc.makePortEnvironmentVariables( );
 
+		if ( appContext.verbose )
+			console.log( "Exposing environment variables:", env );
+
 		await readiness.waitForServices( services );
 
 		child = execa(

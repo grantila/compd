@@ -120,8 +120,9 @@ function splitHostContainer( value: string ): [ string, string ]
 	return [ m[ 1 ], m[ 2 ] ];
 }
 
-function parsePortShort( value: string ): Array< IncompletePort >
+function parsePortShort( value: string | number ): Array< IncompletePort >
 {
+	value = `${value}`;
 	if ( value.includes( ':' ) )
 	{
 		const [ host, container ] = splitHostContainer( value );
@@ -160,7 +161,7 @@ function parsePortLong( value: any): Array< Port >
 
 export function parsePort( value: any ): Array< IncompletePort >
 {
-	return typeof value === 'string'
+	return ( typeof value === 'string' || typeof value === 'number' )
 		? parsePortShort( value )
 		: parsePortLong( value );
 }

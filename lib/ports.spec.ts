@@ -103,6 +103,12 @@ describe( "ports", ( ) =>
 		{
 			expect( parsePort( key ) ).toEqual( value );
 		} );
+
+		if ( !key.match( /[\.:-]/ ) )
+			test( `${key} as number`, ( ) =>
+			{
+				expect( parsePort( parseInt( key, 10 ) ) ).toEqual( value );
+			} );
 	}
 
 	test( "Long syntax tcp/host", ( ) =>

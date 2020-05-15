@@ -46,7 +46,7 @@
     "pre-commit": "^1.2.2",
     "rimraf": "^3.0.0",
     "trace-unhandled": "^1.2.1",
-    "ts-jest": "^25.0.0",
+    "ts-jest": "^26.0.0",
     "typescript": "^3.7.5"
   },
   "dependencies": {

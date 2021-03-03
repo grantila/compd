@@ -1,6 +1,6 @@
 [![npm version][npm-image]][npm-url]
 [![downloads][downloads-image]][npm-url]
-[![build status][travis-image]][travis-url]
+[![build status][build-image]][build-url]
 [![greenkeeper badge][greenkeeper-image]][greenkeeper-url]
 [![Language grade: JavaScript][lgtm-image]][lgtm-url]
 
@@ -50,8 +50,8 @@ There is support for:
 [npm-image]: https://img.shields.io/npm/v/compd.svg
 [npm-url]: https://npmjs.org/package/compd
 [downloads-image]: https://img.shields.io/npm/dm/compd.svg
-[travis-image]: https://img.shields.io/travis/grantila/compd/master.svg
-[travis-url]: https://travis-ci.org/grantila/compd
+[build-image]: https://img.shields.io/github/workflow/status/grantila/compd/Master.svg
+[build-url]: https://github.com/grantila/compd/actions?query=workflow%3AMaster
 [coverage-image]: https://coveralls.io/repos/github/grantila/compd/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/grantila/compd?branch=master
 [greenkeeper-image]: https://badges.greenkeeper.io/grantila/compd.svg

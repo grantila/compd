@@ -1,7 +1,6 @@
 [![npm version][npm-image]][npm-url]
 [![downloads][downloads-image]][npm-url]
 [![build status][travis-image]][travis-url]
-[![coverage status][coverage-image]][coverage-url]
 [![greenkeeper badge][greenkeeper-image]][greenkeeper-url]
 [![Language grade: JavaScript][lgtm-image]][lgtm-url]
 

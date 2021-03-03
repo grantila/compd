@@ -11,6 +11,9 @@
   "bin": {
     "compd": "./bin/compd"
   },
+  "engines": {
+    "node": ">=10"
+  },
   "files": [
     "bin",
     "dist"

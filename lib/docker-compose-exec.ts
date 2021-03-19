@@ -7,9 +7,9 @@ import { KeyValue } from './docker-compose'
 const readFile = promisify( fs.readFile );
 
 
-function quote( text: string )
+export function quote( text: string )
 {
-	return text.replace( /"/g, '\\"' );
+	return text.replace( /(?<![\\])"/g, '\\"' );
 }
 
 export function makeArgsFromEnvironment( env: KeyValue ): Array< string >

@@ -2,7 +2,7 @@ import { promisify } from 'util'
 import * as fs from 'fs'
 import * as execa from 'execa'
 import { load as loadYaml } from 'js-yaml'
-import { KeyValue } from './docker-compose'
+import { StrictKeyValue } from './docker-compose'
 
 const readFile = promisify( fs.readFile );
 
@@ -12,7 +12,7 @@ export function quote( text: string )
 	return text.replace( /(?<![\\])"/g, '\\"' );
 }
 
-export function makeArgsFromEnvironment( env: KeyValue ): Array< string >
+export function makeArgsFromEnvironment( env: StrictKeyValue ): Array< string >
 {
 	return ( [ ] as Array< string > ).concat(
 		...Object.entries( env ).map( ( [ key, value ] ) => [

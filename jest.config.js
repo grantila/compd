@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: "node",
   testMatch: [
     "<rootDir>/test-out/**/*.js",
-    "<rootDir>/lib/**/*.spec.ts",
+    "<rootDir>/lib/**/*.test.ts",
   ],
   modulePathIgnorePatterns: [
     ".*\.d\.ts"

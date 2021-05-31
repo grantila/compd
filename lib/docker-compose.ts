@@ -10,7 +10,11 @@ import {
 
 export class NotSetupError extends Error { }
 
-export type KeyValue = { [ key: string ]: string; };
+export type AnyKeyValue =
+	| Record< string, string | number | boolean | null >
+	| Array< string >;
+
+export type StrictKeyValue = Record< string, string >;
 
 export interface DockerComposeService
 {
@@ -19,25 +23,35 @@ export interface DockerComposeService
 	image: string;
 	containerName: string;
 	containerId: string;
-	environment: KeyValue;
-	labels: KeyValue;
+	environment: StrictKeyValue;
+	labels: StrictKeyValue;
 	ports: Array< Port >;
 }
 
-function parseLabels( labels: Array< string > )
+export function ensureKeyValues( data: AnyKeyValue | undefined )
+: StrictKeyValue
 {
-	const ret: DockerComposeService[ 'labels' ] = { };
+	const ret: StrictKeyValue = { };
 
-	labels.forEach( line =>
-	{
-		const [ key, ...values ] = line.split( '=' );
-		ret[ key ] = values.join( '=' );
-	} );
+	if ( data == null )
+		return ret;
+	else if ( Array.isArray( data ) )
+		data.forEach( line =>
+		{
+			const [ key, ...values ] = line.split( '=' );
+			ret[ key ] = values.join( '=' );
+		} );
+	else
+		for ( const [ key, value ] of Object.entries( data ) )
+			ret[ key ] = `${value}`;
 
 	return ret;
 }
 
-function parseComposeFile( dockerComposeFile: string, composeFileData: any )
+export function parseComposeFile(
+	dockerComposeFile: string,
+	composeFileData: any
+)
 : Array< DockerComposeService >
 {
 	return Object.keys( composeFileData.services )
@@ -51,8 +65,8 @@ function parseComposeFile( dockerComposeFile: string, composeFileData: any )
 			image: service.image,
 			containerName: service.container_name,
 			containerId: void 0 as any as string, // Will be deduced
-			environment: service.environment || { },
-			labels: parseLabels( service.labels || [ ] ),
+			environment: ensureKeyValues( service.environment ),
+			labels: ensureKeyValues( service.labels ),
 			ports: parsePorts( service.ports || [ ] ) as Array< Port >,
 		} ) );
 }

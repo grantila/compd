@@ -60,4 +60,5 @@ wrap( command, args, file, { appContext } )
 .catch( err =>
 {
 	console.error( verbose ? err.stack : err.message );
+	process.exit( 1 );
 } );

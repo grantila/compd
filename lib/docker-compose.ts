@@ -1,4 +1,5 @@
 import * as path from 'path'
+import * as fs from 'fs'
 import { map } from 'already'
 
 import { Port, parsePorts } from './ports'
@@ -78,6 +79,27 @@ function getFileFromCwd( file: string )
 		: path.normalize( path.join( process.cwd( ), file ) );
 }
 
+function getDockerComposeFilename( file: string ): string
+{
+	if ( file === '' ) // Auto-detect
+	{
+		const yml = getFileFromCwd( 'docker-compose.yml' );
+		const yaml = getFileFromCwd( 'docker-compose.yaml' );
+		if ( fs.existsSync( yml ) )
+			return yml;
+		else if ( fs.existsSync( yaml ) )
+			return yaml;
+		else
+			throw new Error( `Cannot find docker-compose.[yml|yaml]` );
+	}
+
+	file = getFileFromCwd( file );
+	if ( !fs.existsSync( file ) )
+		throw new Error( `Cannot find file: ${file}` );
+
+	return file;
+}
+
 export class DockerCompose
 {
 	public dockerComposeFile: string;
@@ -90,10 +112,7 @@ export class DockerCompose
 		dockerComposeExec?: DockerComposeExec
 	)
 	{
-		if ( !dockerComposeFile )
-			throw new Error( "DockerCompose: Misssing argument" );
-
-		this.dockerComposeFile = getFileFromCwd( dockerComposeFile );
+		this.dockerComposeFile = getDockerComposeFilename( dockerComposeFile );
 
 		this.dockerComposeExec = dockerComposeExec ??
 			new DefaultDockerComposeExec( this.dockerComposeFile );

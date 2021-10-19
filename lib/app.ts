@@ -38,17 +38,13 @@ const parsed = oppa( {
 	alias: 'f',
 	description: 'The docker-compose file',
 	type: 'string',
+	default: 'docker-compose.[yml|yaml]',
+	realDefault: '',
 } )
 .parse( );
 
 const [ command, ...args ] = parsed.rest;
 const { file, verbose, teardown } = parsed.args;
-
-if ( !file )
-{
-	console.error( "Missing requied --file argument" );
-	process.exit( 1 );
-}
 
 const appContext = new AppContext( verbose, teardown );
 

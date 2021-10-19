@@ -37,13 +37,7 @@ export interface DockerComposeExec
 
 export class DefaultDockerComposeExec implements DockerComposeExec
 {
-	constructor( public dockerComposeFile: string )
-	{
-		if ( !fs.existsSync( this.dockerComposeFile ) )
-			throw new Error(
-				`Cannot find file: ${this.dockerComposeFile}`
-			);
-	}
+	constructor( public dockerComposeFile: string ) { }
 
 	async loadFile( )
 	{

@@ -58,13 +58,23 @@ export class Readiness
 
 		const matches = findDetectors( );
 
-		if ( matches.length === 0 || !matches[ matches.length - 1 ].final )
+		if ( matches.length === 0 )
 		{
-			console.warn(
-				`Service ${service.name} not understood, ` +
-				"cannot properly await it."
-			);
+			if ( this.appContext.verbose )
+				console.warn(
+					`Service ${service.name} is unknown, cannot await it. ` +
+					"(This is not a bug or an error)"
+				);
 			return;
+		}
+		if ( !matches[ matches.length - 1 ].final )
+		{
+			if ( this.appContext.verbose )
+				console.warn(
+					`Service ${service.name} application layer protocol ` +
+					"unknown. Can only wait for TCP port to be open. " +
+					"(This is not a bug or an error)"
+				);
 		}
 
 		for ( const match of matches )

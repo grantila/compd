@@ -48,7 +48,8 @@ export async function wrap(
 
 	try
 	{
-		const services = await dc.setup( );
+		const dockerHost = await appContext.getDockerHost( );
+		const services = await dc.setup( dockerHost );
 		const env = dc.makePortEnvironmentVariables( );
 
 		if ( appContext.verbose )

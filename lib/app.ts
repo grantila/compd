@@ -24,6 +24,24 @@ const parsed = oppa( {
 	type: 'boolean',
 } )
 .add( {
+	name: 'docker-host',
+	description: [
+		'Detect/specify docker host',
+		'This hostname will be used to set environment variables to the app',
+	],
+	argumentName: 'spec',
+	values: [
+		{ env: 'Use the DOCKER_HOST environment variable (default)' },
+		{ 'env:{name}': 'Use the {name} environment variable' },
+		{ 'route': 'Use the route table to figure out' },
+		{ 'host:{host}': 'Use the specific host {host}' },
+		{ 'no': 'Don\'t detect, use 127.0.0.1' },
+	],
+	default: 'env',
+	realDefault: '',
+	type: 'string',
+} )
+.add( {
 	name: 'teardown',
 	description: [
 		'Tears down the docker-compose after wrapping a command.',
@@ -44,9 +62,9 @@ const parsed = oppa( {
 .parse( );
 
 const [ command, ...args ] = parsed.rest;
-const { file, verbose, teardown } = parsed.args;
+const { file, verbose, teardown, "docker-host": dockerHost } = parsed.args;
 
-const appContext = new AppContext( verbose, teardown );
+const appContext = new AppContext( verbose, teardown, dockerHost );
 
 wrap( command, args, file, { appContext } )
 .then( exitCode =>

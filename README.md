@@ -10,6 +10,8 @@
 
 Ports that are only specified on the container side (i.e. without hard-coded host ports) are deduced, and environment variables are provided to the running command. If a docker-compose file has a service called `"redis"` and a container port `6379`, this will cause an environment variable to be created called `REDIS_PORT_6379` with the value being the host port. If only one port is exposed, a shortcut environment variable without the the container port will be provided too, e.g. `REDIS_PORT`.
 
+Since 4.0, `compd` will also detect the docker host (see below) and set `_HOST` environment variables accordingly, e.g. `REDIS_HOST` which is useful when this is not localhost.
+
 
 # Installation
 
@@ -28,6 +30,14 @@ or run through `npx`:
 ```
 npx compd --file docker-compose.yaml my-app
 ```
+
+
+## Non-localhost docker
+
+When running docker-in-docker in some setups, spinning up a container may not make it reachable on localhost, but on another IP. `compd` will (since 4.0) try to figure out this host by reading the `DOCKER_HOST` environment variable. If this doesn't work, you can:
+ * Set it to a custom one using `--docker-host=host:1.2.3.4` or
+ * Set it to the value of an environment variable using `--docker-host=env:{envvar}` or
+ * Tell `compd` to detect it (by reading `/sbin/ip route` or `route -n`) using `--docker-host=route`.
 
 
 # Readiness detectors

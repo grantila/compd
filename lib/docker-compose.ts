@@ -20,6 +20,7 @@ export type StrictKeyValue = Record< string, string >;
 export interface DockerComposeService
 {
 	dockerComposeFile: string;
+	dockerHost: string;
 	name: string;
 	image: string;
 	containerName: string;
@@ -51,7 +52,8 @@ export function ensureKeyValues( data: AnyKeyValue | undefined )
 
 export function parseComposeFile(
 	dockerComposeFile: string,
-	composeFileData: any
+	composeFileData: any,
+	dockerHost: string
 )
 : Array< DockerComposeService >
 {
@@ -62,6 +64,7 @@ export function parseComposeFile(
 		} ) )
 		.map( ( { name, service } ) => ( {
 			dockerComposeFile,
+			dockerHost,
 			name,
 			image: service.image,
 			containerName: service.container_name,
@@ -183,8 +186,11 @@ export class DockerCompose
 	{
 		const env: { [ key: string ]: string } = { };
 
-		this.ensureLoaded( ).services.forEach( ( { name, ports } ) =>
+		this.ensureLoaded( ).services.forEach(
+			( { dockerHost, name, ports } ) =>
 		{
+			env[ `${ name }_host`.toUpperCase( ) ] = dockerHost;
+
 			ports.forEach( ( { container, host } ) =>
 			{
 				const envName = `${ name }_port_${ container }`.toUpperCase( );
@@ -208,13 +214,14 @@ export class DockerCompose
 		await this.dockerComposeExec.bringUp( );
 	}
 
-	async setup( )
+	async setup( dockerHost: string )
 	{
 		const parse = async ( ) =>
 		{
 			this.services = parseComposeFile(
 				this.dockerComposeFile,
-				await this.dockerComposeExec.loadFile( )
+				await this.dockerComposeExec.loadFile( ),
+				dockerHost
 			);
 		};
 

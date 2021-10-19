@@ -25,12 +25,13 @@ export function makeDetector( opts: DetectorOptions ): Detector
 			{
 				return new Promise< boolean >( resolve =>
 				{
-					const stream = net.createConnection( port );
+					const stream =
+						net.createConnection( port, service.dockerHost );
 
 					stream.on( 'connect', ( ) =>
 					{
-						stream.destroy( );
 						resolve( true );
+						stream.destroy( );
 					} );
 
 					const events = [ 'error', 'close', 'timeout' ];

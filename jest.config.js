@@ -15,5 +15,5 @@ module.exports = {
   setupFiles: [
     "trace-unhandled/register",
   ],
-  maxConcurrency: Infinity,
+  maxConcurrency: 999,
 };

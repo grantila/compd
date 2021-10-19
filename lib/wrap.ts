@@ -77,7 +77,7 @@ export async function wrap(
 
 		completedChild = await child;
 	}
-	catch ( err )
+	catch ( err: any )
 	{
 		if ( appContext.verbose )
 			console.error( err.stack );

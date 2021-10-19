@@ -4,7 +4,7 @@ import * as execa from 'execa'
 import { DockerCompose } from './docker-compose'
 import { forwardSignals, ForwardSignalCleanup } from './process'
 import { Readiness } from './readiness'
-import { Detector } from './readiness-detectors/types'
+import { Detector, RetryLimitError } from './readiness-detectors/types'
 import { AppContext } from './app-context'
 import {
 	makeRedisDetector,
@@ -79,6 +79,8 @@ export async function wrap(
 	}
 	catch ( err: any )
 	{
+		if ( err instanceof RetryLimitError )
+			console.error( err.message );
 		if ( appContext.verbose )
 			console.error( err.stack );
 	}

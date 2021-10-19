@@ -27,17 +27,15 @@ async function pgCliInfo(
 				'bash',
 				'-c',
 				`psql -U ${userName} ${dbNameArg} -c 'select 4711'`
-			],
-			{
-				stderr: process.stderr
-			}
+			]
 		);
 
-		return stdout.includes( '4711' );
+		return { ok: stdout.includes( '4711' ) };
 	}
-	catch ( err )
+	catch ( err: any )
 	{
-		return false;
+		const { stderr = undefined as string | undefined } = err;
+		return { ok: false, stderr };
 	}
 }
 
@@ -68,16 +66,21 @@ export function makeDetector( opts: DetectorOptions ): Detector
 				service.environment[ 'POSTGRES_USER' ] || 'postgres';
 			const dbName = service.environment[ 'POSTGRES_DB' ] || void 0;
 
-			const available = ( ) =>
-				pgCliInfo(
+			let stderror: string | undefined = undefined;
+			const available = async ( ) =>
+			{
+				const { ok, stderr } = await pgCliInfo(
 					service.dockerComposeFile,
 					service.name,
 					userName,
 					dbName
 				);
+				stderror = stderr;
+				return ok;
+			};
 
 			if ( !await retry( available, opts.retryDelay, opts.retryTime ) )
-				throw new RetryLimitError( );
+				throw new RetryLimitError( stderror );
 		},
 	};
 }

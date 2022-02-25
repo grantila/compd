@@ -18,7 +18,7 @@ function makeReadinessDetectors( )
 	return [
 		makeTCPDetector( { retryDelay: 100, retryTime: 5000 } ),
 		makeRedisDetector( { retryDelay: 100, retryTime: 5000 } ),
-		makePostgresDetector( { retryDelay: 200, retryTime: 5000 } ),
+		makePostgresDetector( { retryDelay: 200, retryTime: 15000 } ),
 	];
 }
 

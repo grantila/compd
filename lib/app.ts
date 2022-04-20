@@ -51,6 +51,12 @@ const parsed = oppa( {
 	type: 'number',
 } )
 .add( {
+	name: 'build',
+	description: 'Adds "--build" to "docker-compose up"',
+	default: false,
+	type: 'boolean',
+} )
+.add( {
 	name: 'teardown',
 	description: [
 		'Tears down the docker-compose after wrapping a command.',
@@ -71,9 +77,17 @@ const parsed = oppa( {
 .parse( );
 
 const [ command, ...args ] = parsed.rest;
-const { file, verbose, wait, teardown, "docker-host": dockerHost } = parsed.args;
+const {
+	file,
+	verbose,
+	wait,
+	build,
+	teardown,
+	"docker-host": dockerHost
+} = parsed.args;
 
-const appContext = new AppContext( verbose, teardown, dockerHost, wait );
+const appContext =
+	new AppContext( verbose, teardown, dockerHost, wait, build );
 
 wrap( command, args, file, { appContext } )
 .then( exitCode =>

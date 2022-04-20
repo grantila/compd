@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as execa from 'execa'
 import { load as loadYaml } from 'js-yaml'
 import { StrictKeyValue } from './docker-compose'
+import { AppContext } from './app-context'
 
 const readFile = promisify( fs.readFile );
 
@@ -37,7 +38,11 @@ export interface DockerComposeExec
 
 export class DefaultDockerComposeExec implements DockerComposeExec
 {
-	constructor( public dockerComposeFile: string ) { }
+	constructor(
+		private appContext: AppContext,
+		public dockerComposeFile: string
+	)
+	{ }
 
 	async loadFile( )
 	{
@@ -47,9 +52,13 @@ export class DefaultDockerComposeExec implements DockerComposeExec
 
 	async bringUp( )
 	{
+		const upArgs = [
+			...( this.appContext.build ? [ '--build' ] : [ ] ),
+			'--detach',
+		];
 		await execa(
 			'docker-compose',
-			[ '--file', this.dockerComposeFile, 'up', '--detach' ],
+			[ '--file', this.dockerComposeFile, 'up', ...upArgs ],
 			{
 				stdin: process.stdin,
 				stdout: process.stdout,

@@ -36,7 +36,7 @@ export async function wrap(
 )
 : Promise< number >
 {
-	const dc = new DockerCompose( dockerComposeFile );
+	const dc = new DockerCompose( appContext, dockerComposeFile );
 	const readiness = new Readiness(
 		appContext,
 		readinessDetectors ?? makeReadinessDetectors( )

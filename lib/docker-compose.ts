@@ -7,6 +7,7 @@ import {
 	DockerComposeExec,
 	DefaultDockerComposeExec,
 } from './docker-compose-exec'
+import { AppContext } from './app-context'
 
 
 export class NotSetupError extends Error { }
@@ -111,6 +112,7 @@ export class DockerCompose
 	private dockerComposeExec: DockerComposeExec;
 
 	constructor(
+		private readonly appContext: AppContext,
 		dockerComposeFile: string,
 		dockerComposeExec?: DockerComposeExec
 	)
@@ -118,7 +120,10 @@ export class DockerCompose
 		this.dockerComposeFile = getDockerComposeFilename( dockerComposeFile );
 
 		this.dockerComposeExec = dockerComposeExec ??
-			new DefaultDockerComposeExec( this.dockerComposeFile );
+			new DefaultDockerComposeExec(
+				this.appContext,
+				this.dockerComposeFile
+			);
 	}
 
 	private ensureLoaded( )

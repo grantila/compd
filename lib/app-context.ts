@@ -8,7 +8,8 @@ export class AppContext
 		public readonly verbose: boolean,
 		public readonly teardown: boolean,
 		private readonly dockerHostConfig: string,
-		public readonly wait: number
+		public readonly wait: number,
+		public readonly build: boolean
 	)
 	{
 	}

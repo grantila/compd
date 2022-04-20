@@ -1,3 +1,5 @@
+import { delay } from 'already'
+
 import {
 	Detector,
 	MatchResult,
@@ -104,5 +106,6 @@ export class Readiness
 				await this.waitForService( service )
 			)
 		);
+		await delay( this.appContext.wait * 1000 );
 	}
 }

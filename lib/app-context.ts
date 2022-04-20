@@ -5,9 +5,10 @@ export class AppContext
 	#dockerHost: Promise< string > | undefined = undefined;
 
 	constructor(
-		public verbose: boolean,
-		public teardown: boolean,
-		private dockerHostConfig: string
+		public readonly verbose: boolean,
+		public readonly teardown: boolean,
+		private readonly dockerHostConfig: string,
+		public readonly wait: number
 	)
 	{
 	}

@@ -42,6 +42,15 @@ const parsed = oppa( {
 	type: 'string',
 } )
 .add( {
+	name: 'wait',
+	description: [
+		'Waits {wait} seconds after readiness detectors before running the' +
+		' command'
+	],
+	default: 0,
+	type: 'number',
+} )
+.add( {
 	name: 'teardown',
 	description: [
 		'Tears down the docker-compose after wrapping a command.',
@@ -62,9 +71,9 @@ const parsed = oppa( {
 .parse( );
 
 const [ command, ...args ] = parsed.rest;
-const { file, verbose, teardown, "docker-host": dockerHost } = parsed.args;
+const { file, verbose, wait, teardown, "docker-host": dockerHost } = parsed.args;
 
-const appContext = new AppContext( verbose, teardown, dockerHost );
+const appContext = new AppContext( verbose, teardown, dockerHost, wait );
 
 wrap( command, args, file, { appContext } )
 .then( exitCode =>

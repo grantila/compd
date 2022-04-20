@@ -38,8 +38,8 @@ export function makeDetector( opts: DetectorOptions ): Detector
 		name: "redis",
 		matches( service: DockerComposeService )
 		{
-			const matchByImageName =
-				service.image.toLowerCase( ).includes( 'redis' );
+			const name = service.image ?? service.name;
+			const matchByImageName = name.toLowerCase( ).includes( 'redis' );
 
 			if ( matchByImageName && service.ports.length === 1 )
 			{

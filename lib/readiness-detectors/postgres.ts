@@ -45,8 +45,8 @@ export function makeDetector( opts: DetectorOptions ): Detector
 		name: "postgres",
 		matches( service: DockerComposeService )
 		{
-			const matchByImageName =
-				service.image.toLowerCase( ).includes( 'postgre' );
+			const name = service.image ?? service.name;
+			const matchByImageName = name.toLowerCase( ).includes( 'postgre' );
 
 			if ( matchByImageName && service.ports.length === 1 )
 			{

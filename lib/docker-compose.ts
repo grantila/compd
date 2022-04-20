@@ -23,7 +23,7 @@ export interface DockerComposeService
 	dockerComposeFile: string;
 	dockerHost: string;
 	name: string;
-	image: string;
+	image?: string;
 	containerName: string;
 	containerId: string;
 	environment: StrictKeyValue;
